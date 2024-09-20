@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
@@ -15,49 +16,92 @@ class CalculatorHome extends StatelessWidget {
           Expanded(
             child: BlocListener<CalculatorCubit,
                 ({List<Map<String, String>> results, bool isLoading})>(
-              listener: (context, state) {
-                if (state.isLoading) {
-                  // Handle loading state if needed
-                }
-              },
+              listener: (context, state) {},
               child: BlocBuilder<CalculatorCubit,
                   ({List<Map<String, String>> results, bool isLoading})>(
                 builder: (context, state) {
-                  if (state.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-                  final results = state.results;
-                  return ListView.builder(
-                    itemCount: results.length,
-                    itemBuilder: (context, index) {
-                      final result = results[index];
-                      return ListTile(
-                        title: Text("Input: ${result['expression']}"),
-                        subtitle: Text("Result: ${result['result']}"),
-                      );
-                    },
+                  return AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 200),
+                    child: state.isLoading
+                        ? const Center(
+                            key: ValueKey('loading'),
+                            child: CupertinoActivityIndicator(radius: 15),
+                          )
+                        : ListView.builder(
+                            key: const ValueKey('results'),
+                            itemCount: state.results.length,
+                            itemBuilder: (context, index) {
+                              final result = state.results[index];
+                              return Padding(
+                                padding: const EdgeInsets.fromLTRB(
+                                    8.0, 0.1, 8.0, 0.1),
+                                child: Card(
+                                  elevation: 1,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12.0),
+                                  ),
+                                  child: ListTile(
+                                    title:
+                                        Text("Input: ${result['expression']}"),
+                                    subtitle:
+                                        Text("Result: ${result['result']}"),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                   );
                 },
               ),
             ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  _pickImage(context, ImageSource.camera);
-                },
-                child: const Text("Take photo"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _pickImage(context, ImageSource.gallery);
-                },
-                child: const Text("Pick from file"),
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: CupertinoButton(
+                    onPressed: () {
+                      _pickImage(context, ImageSource.camera);
+                    },
+                    color: Colors.red,
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(CupertinoIcons.camera, color: Colors.white),
+                        SizedBox(width: 8),
+                        Text("Take Photo",
+                            style: TextStyle(color: Colors.white)),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: CupertinoButton(
+                    onPressed: () {
+                      _pickImage(context, ImageSource.gallery);
+                    },
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: const Text(
+                      "Pick from Gallery",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          )
         ],
       ),
     );
