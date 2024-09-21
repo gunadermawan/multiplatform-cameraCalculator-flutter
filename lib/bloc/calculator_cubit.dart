@@ -1,43 +1,52 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:google_ml_kit/google_ml_kit.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class CalculatorCubit extends Cubit<
     ({
       List<Map<String, String>> results,
       bool isLoading,
-      String? errorMessage
+      String? errorMessage,
     })> {
-  CalculatorCubit()
+  final FlutterSecureStorage storage = const FlutterSecureStorage();
+  final bool useEncryptedStorage;
+
+  CalculatorCubit({this.useEncryptedStorage = false})
       : super((results: [], isLoading: false, errorMessage: null)) {
     _loadResultsFromStorage();
   }
 
-  final storage = const FlutterSecureStorage();
-
   Future<void> _loadResultsFromStorage() async {
     emit((results: state.results, isLoading: true, errorMessage: null));
     try {
-      String? storedResults = await storage.read(key: 'results');
+      String? storedResults;
+      if (useEncryptedStorage) {
+        storedResults = await storage.read(key: 'results');
+      } else {
+        // Ganti dengan SharedPreferences jika tidak menggunakan encrypted storage
+        storedResults = await SharedPreferences.getInstance()
+            .then((prefs) => prefs.getString('results'));
+      }
+
       if (storedResults != null) {
         List<dynamic> jsonList = jsonDecode(storedResults);
         List<Map<String, String>> resultsList = jsonList.map((item) {
           return Map<String, String>.from(item);
         }).toList();
         emit((results: resultsList, isLoading: false, errorMessage: null));
-        // log("Data yang dimuat dari storage: $resultsList");
       } else {
-        // log("Tidak ada data yang ditemukan di storage.");
         emit((results: [], isLoading: false, errorMessage: null));
       }
     } catch (e) {
-      // log("Gagal memuat hasil: $e");
       emit((
         results: state.results,
         isLoading: false,
         errorMessage: "Error: $e"
       ));
+      log("error _loadResultsFromStorage $e");
     }
   }
 
@@ -45,20 +54,25 @@ class CalculatorCubit extends Cubit<
     final updatedResults = List<Map<String, String>>.from(state.results);
     updatedResults.add({'expression': expression, 'result': result});
     try {
-      await storage.write(key: 'results', value: jsonEncode(updatedResults));
-      // log("Berhasil menyimpan hasil ke secure storage: $updatedResults");
+      final String encodedResults = jsonEncode(updatedResults);
+      if (useEncryptedStorage) {
+        await storage.write(key: 'results', value: encodedResults);
+      } else {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('results', encodedResults);
+      }
       emit((
         results: updatedResults,
         isLoading: state.isLoading,
         errorMessage: null
       ));
     } catch (e) {
-      // log("Gagal menyimpan hasil ke secure storage: $e");
       emit((
         results: state.results,
         isLoading: state.isLoading,
         errorMessage: "Error: $e"
       ));
+      log("error addResult $e");
     }
   }
 

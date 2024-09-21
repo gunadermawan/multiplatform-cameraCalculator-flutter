@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../bloc/calculator_cubit.dart';
+import '../config/app_config.dart';
 
 class CalculatorHome extends StatelessWidget {
   const CalculatorHome({super.key});
@@ -20,7 +21,7 @@ class CalculatorHome extends StatelessWidget {
                 ({
                   List<Map<String, String>> results,
                   bool isLoading,
-                  String? errorMessage
+                  String? errorMessage,
                 })>(
               listener: (context, state) {
                 if (state.errorMessage != null) {
@@ -38,7 +39,7 @@ class CalculatorHome extends StatelessWidget {
                   ({
                     List<Map<String, String>> results,
                     bool isLoading,
-                    String? errorMessage
+                    String? errorMessage,
                   })>(
                 builder: (context, state) {
                   return AnimatedSwitcher(
@@ -114,30 +115,36 @@ class CalculatorHome extends StatelessWidget {
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CupertinoButton(
-                    onPressed: () {
-                      _pickImage(context, ImageSource.gallery);
-                    },
-                    color: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16.0),
-                    borderRadius: BorderRadius.circular(8.0),
-                    child: const Text(
-                      "Pick from Gallery",
-                      style: TextStyle(color: Colors.blue),
+          if (_shouldShowGalleryButton(context))
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: CupertinoButton(
+                      onPressed: () {
+                        _pickImage(context, ImageSource.gallery);
+                      },
+                      color: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16.0),
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: const Text(
+                        "Pick from Gallery",
+                        style: TextStyle(color: Colors.blue),
+                      ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          )
         ],
       ),
     );
+  }
+
+  bool _shouldShowGalleryButton(BuildContext context) {
+    return AppConfig.useCameraRoll; // Determine based on the AppConfig
   }
 
   void _pickImage(BuildContext context, ImageSource source) async {
@@ -161,19 +168,8 @@ class CalculatorHome extends StatelessWidget {
           );
         }
       }
-    } else if (status.isDenied || status.isPermanentlyDenied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content:
-              const Text("Permission denied. Please enable it in settings."),
-          action: SnackBarAction(
-            label: "Open Settings",
-            onPressed: () {
-              openAppSettings();
-            },
-          ),
-        ),
-      );
+    } else {
+      _showPermissionDeniedSnackBar(context);
     }
   }
 
@@ -182,37 +178,25 @@ class CalculatorHome extends StatelessWidget {
     final status = await permission.status;
     if (status.isGranted) {
       return;
-    } else if (status.isDenied) {
+    } else {
       final requestStatus = await permission.request();
-      if (requestStatus.isGranted) {
-        return;
-      } else if (requestStatus.isPermanentlyDenied) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text(
-                "Permission permanently denied. Please enable it in settings."),
-            action: SnackBarAction(
-              label: "Open Settings",
-              onPressed: () {
-                openAppSettings();
-              },
-            ),
-          ),
-        );
+      if (requestStatus.isPermanentlyDenied) {
+        _showPermissionDeniedSnackBar(context);
       }
-    } else if (status.isPermanentlyDenied) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-              "Permission permanently denied. Please enable it in settings."),
-          action: SnackBarAction(
-            label: "Open Settings",
-            onPressed: () {
-              openAppSettings();
-            },
-          ),
-        ),
-      );
     }
+  }
+
+  void _showPermissionDeniedSnackBar(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text("Permission denied. Please enable it in settings."),
+        action: SnackBarAction(
+          label: "Open Settings",
+          onPressed: () {
+            openAppSettings();
+          },
+        ),
+      ),
+    );
   }
 }

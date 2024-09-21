@@ -54,6 +54,22 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
+    flavorDimensions "theme", "functionality"
+
+    productFlavors {
+        red {
+            dimension "theme"
+        }
+        green {
+            dimension "theme"
+        }
+        camera_roll {
+            dimension "functionality"
+        }
+        built_in_camera {
+            dimension "functionality"
+        }
+    }
 }
 
 flutter {
