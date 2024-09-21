@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import '../bloc/calculator_cubit.dart';
 
 class CalculatorHome extends StatelessWidget {
@@ -140,20 +141,78 @@ class CalculatorHome extends StatelessWidget {
   }
 
   void _pickImage(BuildContext context, ImageSource source) async {
-    final pickedFile = await ImagePicker().pickImage(source: source);
-    if (pickedFile != null) {
-      try {
-        await context
-            .read<CalculatorCubit>()
-            .detectExpressionFromImage(pickedFile.path);
-      } catch (e) {
+    Permission permission =
+        source == ImageSource.camera ? Permission.camera : Permission.storage;
+    await _checkAndRequestPermission(context, permission);
+    final status = await permission.status;
+    if (status.isGranted) {
+      final pickedFile = await ImagePicker().pickImage(source: source);
+      if (pickedFile != null) {
+        try {
+          await context
+              .read<CalculatorCubit>()
+              .detectExpressionFromImage(pickedFile.path);
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(e.toString()),
+              duration: const Duration(seconds: 2),
+            ),
+          );
+        }
+      }
+    } else if (status.isDenied || status.isPermanentlyDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content:
+              const Text("Permission denied. Please enable it in settings."),
+          action: SnackBarAction(
+            label: "Open Settings",
+            onPressed: () {
+              openAppSettings();
+            },
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _checkAndRequestPermission(
+      BuildContext context, Permission permission) async {
+    final status = await permission.status;
+    if (status.isGranted) {
+      return;
+    } else if (status.isDenied) {
+      final requestStatus = await permission.request();
+      if (requestStatus.isGranted) {
+        return;
+      } else if (requestStatus.isPermanentlyDenied) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Error: ${e.toString()}"),
-            duration: const Duration(seconds: 2),
+            content: const Text(
+                "Permission permanently denied. Please enable it in settings."),
+            action: SnackBarAction(
+              label: "Open Settings",
+              onPressed: () {
+                openAppSettings();
+              },
+            ),
           ),
         );
       }
+    } else if (status.isPermanentlyDenied) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text(
+              "Permission permanently denied. Please enable it in settings."),
+          action: SnackBarAction(
+            label: "Open Settings",
+            onPressed: () {
+              openAppSettings();
+            },
+          ),
+        ),
+      );
     }
   }
 }
