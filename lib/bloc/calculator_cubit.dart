@@ -87,11 +87,7 @@ class CalculatorCubit extends Cubit<
       }
       textRecognizer.close();
     } catch (e) {
-      emit((
-        results: state.results,
-        isLoading: false,
-        errorMessage: "error: $e"
-      ));
+      emit((results: state.results, isLoading: false, errorMessage: null));
       rethrow;
     }
     emit((
