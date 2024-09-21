@@ -26,7 +26,6 @@ class CalculatorCubit extends Cubit<
       if (useEncryptedStorage) {
         storedResults = await storage.read(key: 'results');
       } else {
-        // Ganti dengan SharedPreferences jika tidak menggunakan encrypted storage
         storedResults = await SharedPreferences.getInstance()
             .then((prefs) => prefs.getString('results'));
       }
@@ -41,12 +40,8 @@ class CalculatorCubit extends Cubit<
         emit((results: [], isLoading: false, errorMessage: null));
       }
     } catch (e) {
-      emit((
-        results: state.results,
-        isLoading: false,
-        errorMessage: "Error: $e"
-      ));
-      log("error _loadResultsFromStorage $e");
+      emit((results: state.results, isLoading: false, errorMessage: "$e"));
+      // log("error _loadResultsFromStorage $e");
     }
   }
 
@@ -70,9 +65,9 @@ class CalculatorCubit extends Cubit<
       emit((
         results: state.results,
         isLoading: state.isLoading,
-        errorMessage: "Error: $e"
+        errorMessage: "$e"
       ));
-      log("error addResult $e");
+      // log("error addResult $e");
     }
   }
 

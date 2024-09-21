@@ -144,7 +144,7 @@ class CalculatorHome extends StatelessWidget {
   }
 
   bool _shouldShowGalleryButton(BuildContext context) {
-    return AppConfig.useCameraRoll; // Determine based on the AppConfig
+    return AppConfig.useCameraRoll;
   }
 
   void _pickImage(BuildContext context, ImageSource source) async {
