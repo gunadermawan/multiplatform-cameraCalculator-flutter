@@ -12,7 +12,13 @@ class CalculatorHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Image Calculator")),
+      appBar: AppBar(
+        title: const Text(
+          "Image Calculator",
+          style: TextStyle(fontSize: 20.0, color: Colors.grey),
+        ),
+        centerTitle: true,
+      ),
       body: Column(
         children: [
           Expanded(
