@@ -4,17 +4,21 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'bloc/calculator_cubit.dart';
 import 'config/app_config.dart';
+import 'flavors/appRedBuildInCameraRoll.dart';
+import 'flavors/appRedCameraRoll.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SharedPreferences.getInstance();
 
-  if (AppConfig.useEncryptedStorage) {
-    runApp(const AppGreenFilesystem());
-  } else if (AppConfig.useCameraRoll) {
+  if (AppConfig.isRedTheme && AppConfig.useCameraRoll) {
+    runApp(const AppRedCameraRoll());
+  } else if (AppConfig.isRedTheme && AppConfig.useBuiltInCamera) {
+    runApp(const AppRedBuiltInCamera());
+  } else if (AppConfig.isGreenTheme && AppConfig.useCameraRoll) {
     runApp(const AppGreenCameraRoll());
-  } else if (AppConfig.useBuiltInCamera) {
-    runApp(const AppBuiltInCameraRoll());
+  } else if (AppConfig.isGreenTheme && AppConfig.useBuiltInCamera) {
+    runApp(const AppGreenFilesystem());
   } else {
     runApp(const MyApp());
   }

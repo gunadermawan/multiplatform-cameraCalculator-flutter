@@ -34,10 +34,6 @@ android {
     }
 
     defaultConfig {
-        // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.gun.cameracalculator.camera_calculator"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
@@ -46,31 +42,39 @@ android {
 
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig = signingConfigs.debug
+            signingConfig signingConfigs.debug
         }
     }
     flavorDimensions "theme", "functionality"
-
     productFlavors {
         red {
             dimension "theme"
+            applicationIdSuffix ".red"
+            resValue "bool", "USE_ENCRYPTED_STORAGE", "false"
         }
         green {
             dimension "theme"
+            applicationIdSuffix ".green"
+            resValue "bool", "USE_ENCRYPTED_STORAGE", "true"
         }
         camera_roll {
             dimension "functionality"
+            applicationIdSuffix ".camera_roll"
+            resValue "bool", "USE_CAMERA_ROLL", "true"
+            resValue "bool", "USE_BUILT_IN_CAMERA", "false"
         }
         built_in_camera {
             dimension "functionality"
+            applicationIdSuffix ".built_in_camera"
+            resValue "bool", "USE_CAMERA_ROLL", "false"
+            resValue "bool", "USE_BUILT_IN_CAMERA", "true"
         }
     }
 }
+
 
 flutter {
     source = "../.."
