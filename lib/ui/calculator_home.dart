@@ -14,11 +14,31 @@ class CalculatorHome extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: BlocListener<CalculatorCubit,
-                ({List<Map<String, String>> results, bool isLoading})>(
-              listener: (context, state) {},
-              child: BlocBuilder<CalculatorCubit,
-                  ({List<Map<String, String>> results, bool isLoading})>(
+            child: BlocListener<
+                CalculatorCubit,
+                ({
+                  List<Map<String, String>> results,
+                  bool isLoading,
+                  String? errorMessage
+                })>(
+              listener: (context, state) {
+                if (state.errorMessage != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(state.errorMessage!),
+                      duration: const Duration(seconds: 2),
+                    ),
+                  );
+                  context.read<CalculatorCubit>().clearErrorMessage();
+                }
+              },
+              child: BlocBuilder<
+                  CalculatorCubit,
+                  ({
+                    List<Map<String, String>> results,
+                    bool isLoading,
+                    String? errorMessage
+                  })>(
                 builder: (context, state) {
                   return AnimatedSwitcher(
                     duration: const Duration(milliseconds: 200),
@@ -27,29 +47,41 @@ class CalculatorHome extends StatelessWidget {
                             key: ValueKey('loading'),
                             child: CupertinoActivityIndicator(radius: 15),
                           )
-                        : ListView.builder(
-                            key: const ValueKey('results'),
-                            itemCount: state.results.length,
-                            itemBuilder: (context, index) {
-                              final result = state.results[index];
-                              return Padding(
-                                padding: const EdgeInsets.fromLTRB(
-                                    8.0, 0.1, 8.0, 0.1),
-                                child: Card(
-                                  elevation: 1,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0),
-                                  ),
-                                  child: ListTile(
-                                    title:
-                                        Text("Input: ${result['expression']}"),
-                                    subtitle:
-                                        Text("Result: ${result['result']}"),
+                        : state.results.isEmpty
+                            ? Center(
+                                key: const ValueKey('no_data'),
+                                child: Text(
+                                  state.errorMessage ?? "No data found",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.grey,
                                   ),
                                 ),
-                              );
-                            },
-                          ),
+                              )
+                            : ListView.builder(
+                                key: const ValueKey('results'),
+                                itemCount: state.results.length,
+                                itemBuilder: (context, index) {
+                                  final result = state.results[index];
+                                  return Padding(
+                                    padding: const EdgeInsets.fromLTRB(
+                                        8.0, 0.1, 8.0, 0.1),
+                                    child: Card(
+                                      elevation: 1,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(12.0),
+                                      ),
+                                      child: ListTile(
+                                        title: Text(
+                                            "Input: ${result['expression']}"),
+                                        subtitle:
+                                            Text("Result: ${result['result']}"),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
                   );
                 },
               ),
