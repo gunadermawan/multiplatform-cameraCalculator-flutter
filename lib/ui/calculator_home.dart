@@ -121,36 +121,30 @@ class CalculatorHome extends StatelessWidget {
               ],
             ),
           ),
-          if (_shouldShowGalleryButton(context))
-            Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: CupertinoButton(
-                      onPressed: () {
-                        _pickImage(context, ImageSource.gallery);
-                      },
-                      color: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16.0),
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: const Text(
-                        "Pick from Gallery",
-                        style: TextStyle(color: Colors.blue),
-                      ),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+            child: Row(
+              children: [
+                Expanded(
+                  child: CupertinoButton(
+                    onPressed: () {
+                      _pickImage(context, ImageSource.gallery);
+                    },
+                    color: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16.0),
+                    borderRadius: BorderRadius.circular(8.0),
+                    child: const Text(
+                      "Pick from Gallery",
+                      style: TextStyle(color: Colors.blue),
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
+          ),
         ],
       ),
     );
-  }
-
-  bool _shouldShowGalleryButton(BuildContext context) {
-    return AppConfig.useCameraRoll;
   }
 
   void _pickImage(BuildContext context, ImageSource source) async {
