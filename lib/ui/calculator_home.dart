@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '../bloc/calculator_cubit.dart';
-import '../config/app_config.dart';
+import 'history_screen.dart';
 
 class CalculatorHome extends StatelessWidget {
   const CalculatorHome({super.key});
@@ -14,10 +14,20 @@ class CalculatorHome extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Image Calculator",
-          style: TextStyle(fontSize: 20.0, color: Colors.grey),
+          "Calculator",
+          style: TextStyle(fontSize: 20.0, color: Colors.black),
         ),
-        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.history),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const HistoryScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
