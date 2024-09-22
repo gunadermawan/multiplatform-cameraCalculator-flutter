@@ -38,16 +38,21 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 class AppBuiltInCameraRoll extends StatelessWidget {
   const AppBuiltInCameraRoll({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          CalculatorCubit(useEncryptedStorage: AppConfig.useEncryptedStorage),
-      child: const CalculatorHome(),
+    return MaterialApp(
+      title: 'Image Calculator',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: BlocProvider(
+        create: (context) =>
+            CalculatorCubit(useEncryptedStorage: AppConfig.useEncryptedStorage),
+        child: const CalculatorHome(),
+      ),
     );
   }
 }
@@ -57,10 +62,16 @@ class AppGreenCameraRoll extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) =>
-          CalculatorCubit(useEncryptedStorage: AppConfig.useEncryptedStorage),
-      child: const CalculatorHome(),
+    return MaterialApp(
+      title: 'Image Calculator',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: BlocProvider(
+        create: (context) =>
+            CalculatorCubit(useEncryptedStorage: AppConfig.useEncryptedStorage),
+        child: const CalculatorHome(),
+      ),
     );
   }
 }
@@ -70,9 +81,16 @@ class AppGreenFilesystem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => CalculatorCubit(useEncryptedStorage: true),
-      child: const CalculatorHome(),
+    return MaterialApp(
+      title: 'Image Calculator',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: BlocProvider(
+        create: (context) => CalculatorCubit(useEncryptedStorage: true),
+        child: const CalculatorHome(),
+      ),
     );
   }
 }
+
